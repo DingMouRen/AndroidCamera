@@ -15,6 +15,7 @@ import android.widget.ScrollView;
 import android.widget.Scroller;
 
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
+import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 
 /**
  * Created by dingmouren
@@ -31,6 +32,10 @@ public class CameraFragment extends Fragment  {
     private Button mBtnFlash;
     private String[] mFlashModeStr = new String[]{"自动","拍照模式","手电筒模式","关闭"};
 
+    /*对焦模式相关*/
+    private Button mBtnFocus;
+    private String[] mFocusModeStr = new String[]{"自动对焦","拍照模式","录像模式","远景模式","微距模式"};
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class CameraFragment extends Fragment  {
     private void initView(View rootView) {
 
         mBtnFlash = rootView.findViewById(R.id.btn_flash);
+        mBtnFocus = rootView.findViewById(R.id.btn_focus);
         mCameraView = rootView.findViewById(R.id.camera_view);
         mLayoutTop = rootView.findViewById(R.id.layout_top);
 
@@ -62,7 +68,7 @@ public class CameraFragment extends Fragment  {
         mBtnFlash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nextFlashMode();
+                mCameraView.nextFlashMode();
             }
         });
 
@@ -73,14 +79,24 @@ public class CameraFragment extends Fragment  {
                 mBtnFlash.setText(mFlashModeStr[index]);
             }
         });
+
+        /*切换聚焦模式*/
+        mBtnFocus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCameraView.nextFocusMode();
+            }
+        });
+
+        /*聚焦模式的监听*/
+        mCameraView.setOnFocusModeChangedListener(new OnFocusModeChangedListener() {
+            @Override
+            public void onFocusModeChangedListener(int index, String focusMode) {
+                mBtnFocus.setText(mFocusModeStr[index]);
+            }
+        });
     }
 
-    /**
-     * 切换闪光等模式
-     */
-    private void nextFlashMode() {
-        mCameraView.nextFlashMode();
-    }
 
     /**
      * 获取状态栏高度

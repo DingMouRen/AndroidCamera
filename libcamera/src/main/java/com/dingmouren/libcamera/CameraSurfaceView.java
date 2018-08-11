@@ -9,6 +9,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
+import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,7 +34,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private CameraParamsConfig mCameraParamsConfig;/*相机部分参数的持有者*/
 
-    private OnFlashModeChangedListener mFlashModeChangedListener;
+    private OnFlashModeChangedListener mFlashModeChangedListener;/*闪光灯模式的监听*/
+
+    private OnFocusModeChangedListener mFocusModeChangedListener;/*聚焦模式的监听*/
 
 
     public CameraSurfaceView(Context context) {
@@ -108,11 +111,22 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      */
     public void nextFlashMode(){
         mCameraParamsConfig.nextFlashMode();
-        mCamera.stopPreview();
         setCameraParams();
         mCamera.startPreview();
         if (mFlashModeChangedListener != null){
             mFlashModeChangedListener.onFlashModeChangedListener(mCameraParamsConfig.getFlashModeIndex(),mCameraParamsConfig.getFlashMode());
+        }
+    }
+
+    /**
+     * 切换相机的聚焦模式
+     */
+    public void nextFocusMode(){
+        mCameraParamsConfig.nextFocusMode();
+        setCameraParams();
+        mCamera.startPreview();
+        if (mFocusModeChangedListener != null){
+            mFocusModeChangedListener.onFocusModeChangedListener(mCameraParamsConfig.getFocusModeIndex(),mCameraParamsConfig.getFocusMode());
         }
     }
 
@@ -147,11 +161,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
         /*设置闪关灯模式*/
         parameters.setFlashMode(mCameraParamsConfig.getFlashMode());
-        Log.d(TAG,"闪光灯模式:" + mCameraParamsConfig.getFlashMode());
-        List<String> flashs = parameters.getSupportedFlashModes();
-        for (String flash : flashs){
-            Log.e(TAG,flash);
-        }
+
+        /*设置聚焦模式*/
+        parameters.setFocusMode(mCameraParamsConfig.getFocusMode());
 
         /*设置surfaceholder*/
         try {
@@ -213,5 +225,13 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      */
     public void setOnFlashModeChangedListener(OnFlashModeChangedListener listener){
         this.mFlashModeChangedListener = listener;
+    }
+
+    /**
+     * 设置聚焦模式的监听
+     * @param listener
+     */
+    public void setOnFocusModeChangedListener(OnFocusModeChangedListener listener){
+        this.mFocusModeChangedListener = listener;
     }
 }
