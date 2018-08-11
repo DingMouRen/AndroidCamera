@@ -9,6 +9,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
+import com.dingmouren.libcamera.listener.OnEffectChangedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
@@ -43,6 +44,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private OnFocusModeChangedListener mFocusModeChangedListener;/*聚焦模式的监听*/
 
     private OnSceneModeChengedListener mSceneModeChengedListener;/*场景模式的监听*/
+
+    private OnEffectChangedListener mEffectChangedListener;/*颜色效果变化的监听*/
 
 
     public CameraSurfaceView(Context context) {
@@ -83,7 +86,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
+        if (mCamera != null){
+            mCamera.stopPreview();
+            mCamera.release();
+            mCamera = null;
+        }
     }
 
     /**
@@ -150,6 +157,18 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
 
     /**
+     * 切换相机的颜色效果
+     */
+    public void nextEffect(){
+        mCameraParamsConfig.nextEffect();
+        setCameraParams();
+        mCamera.startPreview();
+        if (mEffectChangedListener != null){
+            mEffectChangedListener.onEffectChangedListener(mCameraParamsConfig.getEffectIndex(),mCameraParamsConfig.getEffect());
+        }
+    }
+
+    /**
      * 设置相机参数
      */
     private void setCameraParams(){
@@ -186,6 +205,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
         /*设置场景模式,根据相机的支持进行设置*/
         parameters.setSceneMode(mCameraParamsConfig.getSceneMode());
+
+        /*设置颜色效果*/
+        parameters.setColorEffect(mCameraParamsConfig.getEffect());
 
         /*设置surfaceholder*/
         try {
@@ -254,6 +276,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         /*初始化场景模式数据*/
         mCameraParamsConfig.initSceneModes(parameters.getSupportedSceneModes());
 
+        /*初始化颜色效果的集合数据*/
+        mCameraParamsConfig.initEffects(parameters.getSupportedColorEffects());
+
         if (mCameraConfigListener != null) mCameraConfigListener.onComplete();
     }
 
@@ -286,6 +311,14 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      */
     public void setOnSceneModeChengedListener(OnSceneModeChengedListener listener){
         this.mSceneModeChengedListener = listener;
+    }
+
+    /**
+     * 设置颜色效果的监听
+     * @param listener
+     */
+    public void setOnEffectChangedListener(OnEffectChangedListener listener){
+        this.mEffectChangedListener = listener;
     }
 
     public CameraParamsConfig getCamearaParamsConfig(){

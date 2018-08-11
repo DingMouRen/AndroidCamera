@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 
 import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
+import com.dingmouren.libcamera.listener.OnEffectChangedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
@@ -28,7 +30,7 @@ import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 public class CameraFragment extends Fragment  {
 
     private CameraSurfaceView mCameraView;
-    private ScrollView mLayoutTop;
+    private HorizontalScrollView mLayoutTop;
 
     /*闪光灯有关*/
     private Button mBtnFlash;
@@ -40,6 +42,9 @@ public class CameraFragment extends Fragment  {
 
     /*场景模式相关*/
     private Button mBtnScene;
+
+    /*颜色效果有关*/
+    private Button mBtnEffect;
 
     @Nullable
     @Override
@@ -58,6 +63,7 @@ public class CameraFragment extends Fragment  {
         mBtnFlash = rootView.findViewById(R.id.btn_flash);
         mBtnFocus = rootView.findViewById(R.id.btn_focus);
         mBtnScene = rootView.findViewById(R.id.btn_scene);
+        mBtnEffect = rootView.findViewById(R.id.btn_effect);
         mCameraView = rootView.findViewById(R.id.camera_view);
         mLayoutTop = rootView.findViewById(R.id.layout_top);
 
@@ -76,6 +82,7 @@ public class CameraFragment extends Fragment  {
             @Override
             public void onComplete() {
                 mBtnScene.setText("场景: " + mCameraView.getCamearaParamsConfig().getSceneMode());
+                mBtnEffect.setText("滤镜: " + mCameraView.getCamearaParamsConfig().getEffect());
             }
         });
 
@@ -121,6 +128,21 @@ public class CameraFragment extends Fragment  {
             @Override
             public void onSceneModeChangedListener(int index, String sceneMode) {
                 mBtnScene.setText("场景: "+sceneMode);
+            }
+        });
+
+        /*切换颜色效果*/
+        mBtnEffect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCameraView.nextEffect();
+            }
+        });
+        /*颜色效果切换的监听*/
+        mCameraView.setOnEffectChangedListener(new OnEffectChangedListener() {
+            @Override
+            public void onEffectChangedListener(int index, String effect) {
+                mBtnEffect.setText("滤镜："+effect);
             }
         });
     }

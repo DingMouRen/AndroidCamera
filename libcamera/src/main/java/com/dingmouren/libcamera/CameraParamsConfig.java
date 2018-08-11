@@ -113,4 +113,37 @@ public class CameraParamsConfig {
         this.mCurrentSceneModeIndex = (mCurrentSceneModeIndex + 1) % mSceneModes.size();
     }
 
+    /*系统自带颜色效果*/
+    private int mCurrentEffectInex = 0;
+    private List<String> mEffects = new ArrayList<>();
+
+    /**
+     * 初始化颜色效果的集合
+     */
+    public void initEffects(List<String> effects){
+        mEffects.clear();
+        mEffects.addAll(effects);
+    }
+
+    /**
+     * 获取当前的颜色效果
+     */
+    public String getEffect(){
+        return mEffects.get(mCurrentEffectInex);
+    }
+
+    /**
+     * 返回当前颜色效果的索引
+     */
+    public int getEffectIndex(){
+        return mCurrentEffectInex;
+    }
+
+    /**
+     * 切换颜色效果
+     */
+    public void nextEffect(){
+        this.mCurrentEffectInex = (mCurrentEffectInex + 1) % mEffects.size();
+    }
+
 }

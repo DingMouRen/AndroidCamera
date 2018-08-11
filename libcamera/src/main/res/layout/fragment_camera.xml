@@ -6,10 +6,11 @@
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <ScrollView
+    <HorizontalScrollView
         android:id="@+id/layout_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scrollbars="none"
         >
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,6 +61,21 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 />
+            <Button
+                android:id="@+id/btn_effect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/top_btn_bg"
+                android:layout_margin="10dp"
+                android:textColor="#ffffff"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:singleLine="true"
+                />
         </LinearLayout>
-    </ScrollView>
+    </HorizontalScrollView>
 </FrameLayout>
