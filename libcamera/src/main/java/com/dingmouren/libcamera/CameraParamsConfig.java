@@ -2,6 +2,9 @@ package com.dingmouren.libcamera;
 
 import android.hardware.Camera;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.hardware.Camera.Parameters.FOCUS_MODE_AUTO;
 
 /**
@@ -75,6 +78,39 @@ public class CameraParamsConfig {
      */
     public void nextFocusMode(){
         this.mCurrentFocusModeIndex = (mCurrentFocusModeIndex + 1) % mFocusModes.length;
+    }
+
+    /*场景模式相关*/
+    private int mCurrentSceneModeIndex = 0;
+    private List<String> mSceneModes = new ArrayList<>();
+
+    /**
+     * 初始化场景模式
+     */
+    public void initSceneModes(List<String> sceneModes){
+        mSceneModes.clear();
+        mSceneModes.addAll(sceneModes);
+    }
+
+    /**
+     * 获取当前的场景模式
+     */
+    public String getSceneMode(){
+        return mSceneModes.get(mCurrentSceneModeIndex);
+    }
+
+    /**
+     * 返回当前场景模式的索引
+     */
+    public int getSceneModeIndex(){
+        return mCurrentSceneModeIndex;
+    }
+
+    /**
+     * 切换场景模式
+     */
+    public void nextSceneMode(){
+        this.mCurrentSceneModeIndex = (mCurrentSceneModeIndex + 1) % mSceneModes.size();
     }
 
 }

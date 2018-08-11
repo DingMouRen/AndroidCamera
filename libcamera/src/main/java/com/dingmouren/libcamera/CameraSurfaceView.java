@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
+import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,9 +36,13 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private CameraParamsConfig mCameraParamsConfig;/*相机部分参数的持有者*/
 
+    private OnCameraParamsConfigInitedListener mCameraConfigListener;/*CameraParamsConfig数据初始化完成的监听*/
+
     private OnFlashModeChangedListener mFlashModeChangedListener;/*闪光灯模式的监听*/
 
     private OnFocusModeChangedListener mFocusModeChangedListener;/*聚焦模式的监听*/
+
+    private OnSceneModeChengedListener mSceneModeChengedListener;/*场景模式的监听*/
 
 
     public CameraSurfaceView(Context context) {
@@ -64,6 +70,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         this.mCamera = openCamera();
+        initCameraParamsConfig();/*初始化相机部分参数的持有者的数据*/
     }
 
     @Override
@@ -131,6 +138,18 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
 
     /**
+     * 切换相机的场景模式
+     */
+    public void nextSceneMode(){
+        mCameraParamsConfig.nextSceneMode();
+        setCameraParams();
+        mCamera.startPreview();
+        if (mSceneModeChengedListener != null){
+            mSceneModeChengedListener.onSceneModeChangedListener(mCameraParamsConfig.getSceneModeIndex(),mCameraParamsConfig.getSceneMode());
+        }
+    }
+
+    /**
      * 设置相机参数
      */
     private void setCameraParams(){
@@ -165,6 +184,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         /*设置聚焦模式*/
         parameters.setFocusMode(mCameraParamsConfig.getFocusMode());
 
+        /*设置场景模式,根据相机的支持进行设置*/
+        parameters.setSceneMode(mCameraParamsConfig.getSceneMode());
+
         /*设置surfaceholder*/
         try {
             mCamera.setPreviewDisplay(mSurfaceHolder);
@@ -183,7 +205,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      * @param sizeList
      * @return
      */
-    protected Camera.Size getBestSize(int surfaceWidth, int surfaceHeight,
+    private Camera.Size getBestSize(int surfaceWidth, int surfaceHeight,
                                             List<Camera.Size> sizeList) {
 
         int ReqTmpWidth;
@@ -220,6 +242,29 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
 
     /**
+     * 初始化相机部分参数的持有者的数据
+     */
+    private void initCameraParamsConfig() {
+        if (mCamera == null){
+            Log.e(TAG,"mCamera为空");
+            return;
+        }
+        Camera.Parameters parameters = mCamera.getParameters();
+
+        /*初始化场景模式数据*/
+        mCameraParamsConfig.initSceneModes(parameters.getSupportedSceneModes());
+
+        if (mCameraConfigListener != null) mCameraConfigListener.onComplete();
+    }
+
+    /**
+     * 设置CameraParamsConfig数据初始化完成的监听
+     */
+    public void setOnCameraParamsConfigInitedListener(OnCameraParamsConfigInitedListener listener){
+        this.mCameraConfigListener = listener;
+    }
+
+    /**
      * 设置闪光灯模式变化的监听
      * @param listener
      */
@@ -233,5 +278,17 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      */
     public void setOnFocusModeChangedListener(OnFocusModeChangedListener listener){
         this.mFocusModeChangedListener = listener;
+    }
+
+    /**
+     * 设置场景模式的监听
+     * @param listener
+     */
+    public void setOnSceneModeChengedListener(OnSceneModeChengedListener listener){
+        this.mSceneModeChengedListener = listener;
+    }
+
+    public CameraParamsConfig getCamearaParamsConfig(){
+        return mCameraParamsConfig;
     }
 }

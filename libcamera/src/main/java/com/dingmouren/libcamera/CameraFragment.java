@@ -14,8 +14,10 @@ import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 
+import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
+import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 
 /**
  * Created by dingmouren
@@ -36,6 +38,9 @@ public class CameraFragment extends Fragment  {
     private Button mBtnFocus;
     private String[] mFocusModeStr = new String[]{"自动对焦","拍照模式","录像模式","远景模式","微距模式"};
 
+    /*场景模式相关*/
+    private Button mBtnScene;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class CameraFragment extends Fragment  {
 
         mBtnFlash = rootView.findViewById(R.id.btn_flash);
         mBtnFocus = rootView.findViewById(R.id.btn_focus);
+        mBtnScene = rootView.findViewById(R.id.btn_scene);
         mCameraView = rootView.findViewById(R.id.camera_view);
         mLayoutTop = rootView.findViewById(R.id.layout_top);
 
@@ -61,9 +67,18 @@ public class CameraFragment extends Fragment  {
         FrameLayout.LayoutParams params1 = (FrameLayout.LayoutParams) mLayoutTop.getLayoutParams();
         params1.topMargin = statusBarHeight + marginTop;
         mLayoutTop.setLayoutParams(params1);
+
     }
 
     private void initListener(){
+        /*CameraParamsConfig数据初始化完成的监听*/
+        mCameraView.setOnCameraParamsConfigInitedListener(new OnCameraParamsConfigInitedListener() {
+            @Override
+            public void onComplete() {
+                mBtnScene.setText("场景: " + mCameraView.getCamearaParamsConfig().getSceneMode());
+            }
+        });
+
         /*切换闪光等模式*/
         mBtnFlash.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +86,6 @@ public class CameraFragment extends Fragment  {
                 mCameraView.nextFlashMode();
             }
         });
-
         /*闪光灯模式切换的监听*/
         mCameraView.setOnFlashModeChangedListener(new OnFlashModeChangedListener() {
             @Override
@@ -87,12 +101,26 @@ public class CameraFragment extends Fragment  {
                 mCameraView.nextFocusMode();
             }
         });
-
-        /*聚焦模式的监听*/
+        /*聚焦模式切换的监听*/
         mCameraView.setOnFocusModeChangedListener(new OnFocusModeChangedListener() {
             @Override
             public void onFocusModeChangedListener(int index, String focusMode) {
                 mBtnFocus.setText(mFocusModeStr[index]);
+            }
+        });
+
+        /*切换场景模式*/
+        mBtnScene.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCameraView.nextSceneMode();
+            }
+        });
+        /*场景模式切换的监听*/
+        mCameraView.setOnSceneModeChengedListener(new OnSceneModeChengedListener() {
+            @Override
+            public void onSceneModeChangedListener(int index, String sceneMode) {
+                mBtnScene.setText("场景: "+sceneMode);
             }
         });
     }
