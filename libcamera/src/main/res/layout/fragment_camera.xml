@@ -18,6 +18,21 @@
             android:orientation="horizontal"
             >
             <Button
+                android:id="@+id/btn_switch_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/top_btn_bg"
+                android:layout_margin="10dp"
+                android:text="切换摄像头"
+                android:textColor="#ffffff"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                />
+            <Button
                 android:id="@+id/btn_flash"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

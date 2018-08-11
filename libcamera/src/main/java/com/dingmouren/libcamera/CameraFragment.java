@@ -46,6 +46,9 @@ public class CameraFragment extends Fragment  {
     /*颜色效果有关*/
     private Button mBtnEffect;
 
+    /*切换摄像头*/
+    private Button mBtnSwitchCamera;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -63,6 +66,7 @@ public class CameraFragment extends Fragment  {
         mBtnFlash = rootView.findViewById(R.id.btn_flash);
         mBtnFocus = rootView.findViewById(R.id.btn_focus);
         mBtnScene = rootView.findViewById(R.id.btn_scene);
+        mBtnSwitchCamera = rootView.findViewById(R.id.btn_switch_camera);
         mBtnEffect = rootView.findViewById(R.id.btn_effect);
         mCameraView = rootView.findViewById(R.id.camera_view);
         mLayoutTop = rootView.findViewById(R.id.layout_top);
@@ -83,6 +87,14 @@ public class CameraFragment extends Fragment  {
             public void onComplete() {
                 mBtnScene.setText("场景: " + mCameraView.getCamearaParamsConfig().getSceneMode());
                 mBtnEffect.setText("滤镜: " + mCameraView.getCamearaParamsConfig().getEffect());
+            }
+        });
+
+        /*切换摄像头*/
+        mBtnSwitchCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCameraView.switchCamera();
             }
         });
 

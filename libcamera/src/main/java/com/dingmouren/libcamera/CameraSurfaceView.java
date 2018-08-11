@@ -117,7 +117,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             camerId = Camera.CameraInfo.CAMERA_FACING_BACK;
         }
         this.mCameraId = camerId;
-
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = Camera.open(mCameraId);
+        setCameraParams();
+        mCamera.startPreview();
     }
 
     /**
@@ -198,9 +202,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         }
 
         /*设置闪关灯模式*/
+        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK)
         parameters.setFlashMode(mCameraParamsConfig.getFlashMode());
 
         /*设置聚焦模式*/
+        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK)
         parameters.setFocusMode(mCameraParamsConfig.getFocusMode());
 
         /*设置场景模式,根据相机的支持进行设置*/
