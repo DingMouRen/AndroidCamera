@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -29,6 +31,10 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;/*默认是后置摄像头*/
 
+    private CameraParamsConfig mCameraParamsConfig;/*相机部分参数的持有者*/
+
+    private OnFlashModeChangedListener mFlashModeChangedListener;
+
 
     public CameraSurfaceView(Context context) {
         super(context);
@@ -49,16 +55,12 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private void initView(Context context) {
         this.mSurfaceHolder = getHolder();
         mSurfaceHolder.addCallback(this);
+        mCameraParamsConfig = new CameraParamsConfig();
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         this.mCamera = openCamera();
-        try {
-            mCamera.setPreviewDisplay(surfaceHolder);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -102,9 +104,22 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
 
     /**
+     * 切换相机闪光灯模式
+     */
+    public void nextFlashMode(){
+        mCameraParamsConfig.nextFlashMode();
+        mCamera.stopPreview();
+        setCameraParams();
+        mCamera.startPreview();
+        if (mFlashModeChangedListener != null){
+            mFlashModeChangedListener.onFlashModeChangedListener(mCameraParamsConfig.getFlashModeIndex(),mCameraParamsConfig.getFlashMode());
+        }
+    }
+
+    /**
      * 设置相机参数
      */
-    public void setCameraParams(){
+    private void setCameraParams(){
 
         if (mCamera == null){
             Log.e(TAG,"mCamera对象为空");
@@ -115,12 +130,12 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
         /*设置预览宽高*/
         Camera.Size previewSize = getBestSize(mSurfaceViewWidth,mSurfaceViewHeight,parameters.getSupportedPreviewSizes());
-        Log.e(TAG,"设置预览宽高:"+previewSize.width+"/"+previewSize.height);
+        Log.i(TAG,"设置预览宽高:"+previewSize.width+"/"+previewSize.height);
         parameters.setPreviewSize(previewSize.width,previewSize.height);
 
         /*设置图片宽高*/
         Camera.Size pictureSize = getBestSize(mSurfaceViewWidth,mSurfaceViewHeight,parameters.getSupportedPictureSizes());
-        Log.e(TAG,"设置图片宽高:"+pictureSize.width+"/"+pictureSize.height);
+        Log.i(TAG,"设置图片宽高:"+pictureSize.width+"/"+pictureSize.height);
         parameters.setPictureSize(pictureSize.width,pictureSize.height);
 
         /*设置屏幕方向*/
@@ -130,7 +145,23 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             mCamera.setDisplayOrientation(0);
         }
 
+        /*设置闪关灯模式*/
+        parameters.setFlashMode(mCameraParamsConfig.getFlashMode());
+        Log.d(TAG,"闪光灯模式:" + mCameraParamsConfig.getFlashMode());
+        List<String> flashs = parameters.getSupportedFlashModes();
+        for (String flash : flashs){
+            Log.e(TAG,flash);
+        }
+
+        /*设置surfaceholder*/
+        try {
+            mCamera.setPreviewDisplay(mSurfaceHolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         mCamera.setParameters(parameters);
+
     }
 
     /**
@@ -146,7 +177,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         int ReqTmpWidth;
         int ReqTmpHeight;
         // 当屏幕为垂直的时候需要把宽高值进行调换，保证宽大于高
-        if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (getContext().getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
             ReqTmpWidth = surfaceHeight;
             ReqTmpHeight = surfaceWidth;
         } else {
@@ -154,11 +185,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             ReqTmpHeight = surfaceHeight;
         }
         //先查找preview中是否存在与surfaceview相同宽高的尺寸
-        Log.e(TAG,"支持的尺寸:");
         for(Camera.Size size : sizeList){
-            Log.e(TAG,size.width+" * "+ size.height);
             if((size.width == ReqTmpWidth) && (size.height == ReqTmpHeight)){
-                Log.e(TAG,"尺寸1："+size.width+"/"+size.height);
                 return size;
             }
         }
@@ -176,9 +204,14 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                 retSize = size;
             }
         }
-
-        Log.e(TAG,"尺寸2："+retSize.width+"/"+retSize.height);
-
         return retSize;
+    }
+
+    /**
+     * 设置闪光灯模式变化的监听
+     * @param listener
+     */
+    public void setOnFlashModeChangedListener(OnFlashModeChangedListener listener){
+        this.mFlashModeChangedListener = listener;
     }
 }
