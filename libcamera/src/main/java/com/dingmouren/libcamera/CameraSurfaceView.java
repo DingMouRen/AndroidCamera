@@ -193,6 +193,12 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      * 拍照
      */
     public void takePhoto(){
+
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+        mCamera.setParameters(parameters);
+        mCamera.startPreview();
+
         mCamera.takePicture(null, null, new PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
