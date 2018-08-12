@@ -1,8 +1,18 @@
 package com.dingmouren.libcamera;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -13,9 +23,16 @@ import com.dingmouren.libcamera.listener.OnEffectChangedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
+import com.dingmouren.libcamera.task.SavePhotoTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+
+import static android.hardware.Camera.*;
 
 /**
  * Created by dingmouren
@@ -33,7 +50,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
     private Camera mCamera;
 
-    private int mCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;/*默认是后置摄像头*/
+    private int mCameraId = CameraInfo.CAMERA_FACING_BACK;/*默认是后置摄像头*/
 
     private CameraParamsConfig mCameraParamsConfig;/*相机部分参数的持有者*/
 
@@ -99,7 +116,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private Camera  openCamera(){
         Camera camera = null;
         try {
-            camera = Camera.open();
+            camera = open();
         }catch (Exception e){
             Log.e(TAG,e.getMessage());
         }
@@ -111,15 +128,15 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
      */
     public void switchCamera(){
         int camerId = 0;
-        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK){
-            camerId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+        if (mCameraId == CameraInfo.CAMERA_FACING_BACK){
+            camerId = CameraInfo.CAMERA_FACING_FRONT;
         }else {
-            camerId = Camera.CameraInfo.CAMERA_FACING_BACK;
+            camerId = CameraInfo.CAMERA_FACING_BACK;
         }
         this.mCameraId = camerId;
         mCamera.stopPreview();
         mCamera.release();
-        mCamera = Camera.open(mCameraId);
+        mCamera = open(mCameraId);
         setCameraParams();
         mCamera.startPreview();
     }
@@ -173,6 +190,20 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     }
 
     /**
+     * 拍照
+     */
+    public void takePhoto(){
+        mCamera.takePicture(null, null, new PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+                mCamera.stopPreview();
+               new SavePhotoTask(getContext()).execute(data);
+               mCamera.startPreview();
+            }
+        });
+    }
+
+    /**
      * 设置相机参数
      */
     private void setCameraParams(){
@@ -202,11 +233,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         }
 
         /*设置闪关灯模式*/
-        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK)
+        if (mCameraId == CameraInfo.CAMERA_FACING_BACK)
         parameters.setFlashMode(mCameraParamsConfig.getFlashMode());
 
         /*设置聚焦模式*/
-        if (mCameraId == Camera.CameraInfo.CAMERA_FACING_BACK)
+        if (mCameraId == CameraInfo.CAMERA_FACING_BACK)
         parameters.setFocusMode(mCameraParamsConfig.getFocusMode());
 
         /*设置场景模式,根据相机的支持进行设置*/

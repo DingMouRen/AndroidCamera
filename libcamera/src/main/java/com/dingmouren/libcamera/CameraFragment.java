@@ -20,6 +20,7 @@ import com.dingmouren.libcamera.listener.OnEffectChangedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
+import com.dingmouren.libcamera.view.TouchControlView;
 
 /**
  * Created by dingmouren
@@ -31,6 +32,7 @@ public class CameraFragment extends Fragment  {
 
     private CameraSurfaceView mCameraView;
     private HorizontalScrollView mLayoutTop;
+    private TouchControlView mTouchControlView;
 
     /*闪光灯有关*/
     private Button mBtnFlash;
@@ -70,6 +72,7 @@ public class CameraFragment extends Fragment  {
         mBtnEffect = rootView.findViewById(R.id.btn_effect);
         mCameraView = rootView.findViewById(R.id.camera_view);
         mLayoutTop = rootView.findViewById(R.id.layout_top);
+        mTouchControlView = rootView.findViewById(R.id.touch_control_view);
 
         /*头部工具栏的margintop的值*/
         int statusBarHeight = getStatusBarHeight(getContext());
@@ -155,6 +158,28 @@ public class CameraFragment extends Fragment  {
             @Override
             public void onEffectChangedListener(int index, String effect) {
                 mBtnEffect.setText("滤镜："+effect);
+            }
+        });
+
+        /*拍照+录像*/
+        mTouchControlView.setOnRecordListener(new TouchControlView.OnRecordListener() {
+
+            /*拍照*/
+            @Override
+            public void onShortClick() {
+                mCameraView.takePhoto();
+            }
+
+            /*录制开始*/
+            @Override
+            public void OnRecordStartClick() {
+
+            }
+
+            /*录制结束*/
+            @Override
+            public void OnFinish(int resultCode) {
+
             }
         });
     }

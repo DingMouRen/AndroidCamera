@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.dingmouren.libcamera.CameraSurfaceView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
@@ -93,4 +94,15 @@
                 />
         </LinearLayout>
     </HorizontalScrollView>
+    <com.dingmouren.libcamera.view.TouchControlView
+        android:id="@+id/touch_control_view"
+        android:layout_width="250px"
+        android:layout_height="250px"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        app:excircleRadius="100px"
+        app:innerCircleRadius="70px"
+        app:maxTime="20"
+        app:minTime="10"
+        />
 </FrameLayout>

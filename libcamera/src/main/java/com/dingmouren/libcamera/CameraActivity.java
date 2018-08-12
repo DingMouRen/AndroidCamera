@@ -26,6 +26,9 @@ public class CameraActivity extends AppCompatActivity {
         if (PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this,new String[]{ Manifest.permission.CAMERA},1);
         }
+        if (PermissionChecker.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE},2);
+        }
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_layout,new CameraFragment())
