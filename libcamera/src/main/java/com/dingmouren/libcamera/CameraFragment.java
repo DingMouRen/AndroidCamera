@@ -1,10 +1,14 @@
 package com.dingmouren.libcamera;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,25 +26,30 @@ import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 import com.dingmouren.libcamera.view.TouchControlView;
 
+import java.util.Arrays;
+
 /**
  * Created by dingmouren
  * email: naildingmouren@gmail.com
  * github: https://github.com/DingMouRen
  */
 
-public class CameraFragment extends Fragment  {
+public class CameraFragment extends Fragment {
+
+    private final String TAG = this.getClass().getSimpleName();
 
     private CameraSurfaceView mCameraView;
     private HorizontalScrollView mLayoutTop;
     private TouchControlView mTouchControlView;
 
+
     /*闪光灯有关*/
     private Button mBtnFlash;
-    private String[] mFlashModeStr = new String[]{"自动","拍照模式","手电筒模式","关闭"};
+    private String[] mFlashModeStr = new String[]{"自动", "拍照模式", "手电筒模式", "关闭"};
 
     /*对焦模式相关*/
     private Button mBtnFocus;
-    private String[] mFocusModeStr = new String[]{"自动对焦","拍照模式","录像模式","远景模式","微距模式"};
+    private String[] mFocusModeStr = new String[]{"自动对焦", "拍照模式", "录像模式", "远景模式", "微距模式"};
 
     /*场景模式相关*/
     private Button mBtnScene;
@@ -51,10 +60,16 @@ public class CameraFragment extends Fragment  {
     /*切换摄像头*/
     private Button mBtnSwitchCamera;
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_camera,container,false);
+        View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
 
         initView(rootView);
 
@@ -64,6 +79,8 @@ public class CameraFragment extends Fragment  {
     }
 
     private void initView(View rootView) {
+
+
 
         mBtnFlash = rootView.findViewById(R.id.btn_flash);
         mBtnFocus = rootView.findViewById(R.id.btn_focus);
@@ -76,14 +93,14 @@ public class CameraFragment extends Fragment  {
 
         /*头部工具栏的margintop的值*/
         int statusBarHeight = getStatusBarHeight(getContext());
-        int marginTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,0,getContext().getResources().getDisplayMetrics());
+        int marginTop = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0, getContext().getResources().getDisplayMetrics());
         FrameLayout.LayoutParams params1 = (FrameLayout.LayoutParams) mLayoutTop.getLayoutParams();
         params1.topMargin = statusBarHeight + marginTop;
         mLayoutTop.setLayoutParams(params1);
 
     }
 
-    private void initListener(){
+    private void initListener() {
         /*CameraParamsConfig数据初始化完成的监听*/
         mCameraView.setOnCameraParamsConfigInitedListener(new OnCameraParamsConfigInitedListener() {
             @Override
@@ -142,7 +159,7 @@ public class CameraFragment extends Fragment  {
         mCameraView.setOnSceneModeChengedListener(new OnSceneModeChengedListener() {
             @Override
             public void onSceneModeChangedListener(int index, String sceneMode) {
-                mBtnScene.setText("场景: "+sceneMode);
+                mBtnScene.setText("场景: " + sceneMode);
             }
         });
 
@@ -157,7 +174,7 @@ public class CameraFragment extends Fragment  {
         mCameraView.setOnEffectChangedListener(new OnEffectChangedListener() {
             @Override
             public void onEffectChangedListener(int index, String effect) {
-                mBtnEffect.setText("滤镜："+effect);
+                mBtnEffect.setText("滤镜：" + effect);
             }
         });
 
@@ -173,13 +190,13 @@ public class CameraFragment extends Fragment  {
             /*录制开始*/
             @Override
             public void OnRecordStartClick() {
-
+                mCameraView.startRecordVideo();
             }
 
             /*录制结束*/
             @Override
             public void OnFinish(int resultCode) {
-
+                mCameraView.stopRecordVideo();
             }
         });
     }
@@ -187,6 +204,7 @@ public class CameraFragment extends Fragment  {
 
     /**
      * 获取状态栏高度
+     *
      * @param context
      * @return
      */
@@ -199,4 +217,5 @@ public class CameraFragment extends Fragment  {
         return result;
     }
 
-    }
+
+}

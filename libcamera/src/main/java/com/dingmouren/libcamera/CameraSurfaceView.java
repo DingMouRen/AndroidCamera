@@ -10,7 +10,9 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.ExifInterface;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.AttributeSet;
@@ -49,6 +51,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private int mSurfaceViewWidth,mSurfaceViewHeight;
 
     private Camera mCamera;
+
+    private MediaRecorder mMediaRecorder;
 
     private int mCameraId = CameraInfo.CAMERA_FACING_BACK;/*默认是后置摄像头*/
 
@@ -97,6 +101,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
         this.mSurfaceViewWidth = width;
         this.mSurfaceViewHeight = height;
+        if (mCamera == null) return;
         setCameraParams();
         mCamera.startPreview();
     }
@@ -108,6 +113,21 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             mCamera.release();
             mCamera = null;
         }
+    }
+
+    /**
+     * 开启预览
+     */
+    public void startPreview(){
+        setCameraParams();
+        mCamera.startPreview();
+    }
+
+    /**
+     * 停止预览
+     */
+    public void stopPreview(){
+        mCamera.stopPreview();
     }
 
     /**
@@ -207,6 +227,70 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
                mCamera.startPreview();
             }
         });
+    }
+
+    /**
+     * 开始录制视频
+     */
+    public void startRecordVideo(){
+
+        if(mCamera == null){
+            Log.e(TAG,"Camera为null");
+            return;
+        }
+
+        Camera.Parameters parameters = mCamera.getParameters();
+        parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+        mCamera.setParameters(parameters);
+        mCamera.startPreview();
+
+        if (mMediaRecorder == null){
+            mMediaRecorder = new MediaRecorder();
+        }else {
+            mMediaRecorder.reset();
+        }
+
+        try {
+
+            /*1.解锁相机，为MediaRecorder设置相机*/
+            mCamera.unlock();
+            mMediaRecorder.setCamera(mCamera);
+
+            /*2.设置音频源和视频源*/
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+
+            /*3.CamcorderProfile.QUALITY_HIGH:质量等级对应于最高可用分辨率*/
+            mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+
+            /*4.设置输出文件*/
+             String dirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
+            File dirFile = new File(dirPath);
+            if (!dirFile.exists()) dirFile.mkdir();
+            File videoFile = new File(dirPath +"VIDEO_"+ System.currentTimeMillis()+".mp4");
+            mMediaRecorder.setOutputFile(videoFile.getAbsolutePath());
+
+            /*5.设置预览输出*/
+            mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
+
+            /*6.准备配置*/
+            mMediaRecorder.prepare();
+
+            /*7.开始录制*/
+            mMediaRecorder.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 结束录制
+     */
+    public void stopRecordVideo(){
+        if (mMediaRecorder != null){
+            mMediaRecorder.stop();
+            mMediaRecorder.release();
+        }
     }
 
     /**

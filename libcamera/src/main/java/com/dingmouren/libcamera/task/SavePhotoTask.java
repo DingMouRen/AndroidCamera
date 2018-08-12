@@ -27,7 +27,7 @@ public class SavePhotoTask  extends AsyncTask<byte[],Integer,String>{
 
     private Context mContext;
 
-    private String mDirPath = Environment.getExternalStorageDirectory()+"/DingMouRen/";
+    private String mDirPath = Environment.getExternalStorageDirectory()+"/DICM/Camera/";
 
     public SavePhotoTask(Context context){
         this.mContext = context;
@@ -45,7 +45,7 @@ public class SavePhotoTask  extends AsyncTask<byte[],Integer,String>{
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         Bitmap newBitamap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-        String filePath = mDirPath + System.currentTimeMillis()+".png";
+        String filePath = mDirPath +"IMG_"+ System.currentTimeMillis()+".png";
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             newBitamap.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);

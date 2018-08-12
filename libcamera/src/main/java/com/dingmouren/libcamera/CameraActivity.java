@@ -3,10 +3,14 @@ package com.dingmouren.libcamera;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
+import java.util.Arrays;
 
 /**
  * Created by dingmouren
@@ -18,20 +22,38 @@ public class CameraActivity extends AppCompatActivity {
 
     private final String TAG = this.getClass().getName();
 
+    private String[] mRequiredPermissions = new String[]{
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO
+    };
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
 
-        if (PermissionChecker.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{ Manifest.permission.CAMERA},1);
-        }
-        if (PermissionChecker.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this,new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE},2);
-        }
+        ActivityCompat.requestPermissions(this, mRequiredPermissions, 1);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout,new CameraFragment())
-                .commit();
+
+
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.e(TAG,requestCode+" "+ Arrays.toString(permissions)+" "+Arrays.toString(grantResults));
+        switch (requestCode){
+            case 1:
+                if (grantResults.length > 0){
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.frame_layout,new CameraFragment())
+                            .commit();
+                }
+                break;
+        }
     }
 }
