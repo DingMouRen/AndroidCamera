@@ -19,6 +19,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
 import com.dingmouren.libcamera.listener.OnEffectChangedListener;
@@ -53,6 +54,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
     private Camera mCamera;
 
     private MediaRecorder mMediaRecorder;
+
+    private String mVideoFilePath;/*录制的视频路径*/
 
     private int mCameraId = CameraInfo.CAMERA_FACING_BACK;/*默认是后置摄像头*/
 
@@ -264,11 +267,11 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
 
             /*4.设置输出文件*/
-             String dirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
+            String dirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
             File dirFile = new File(dirPath);
-            if (!dirFile.exists()) dirFile.mkdir();
-            File videoFile = new File(dirPath +"VIDEO_"+ System.currentTimeMillis()+".mp4");
-            mMediaRecorder.setOutputFile(videoFile.getAbsolutePath());
+            if (!dirFile.exists()) dirFile.mkdirs();
+            mVideoFilePath = dirPath +"VIDEO_"+ System.currentTimeMillis()+".mp4";
+            mMediaRecorder.setOutputFile(mVideoFilePath);
 
             /*5.设置预览输出*/
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
@@ -290,6 +293,8 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
         if (mMediaRecorder != null){
             mMediaRecorder.stop();
             mMediaRecorder.release();
+            getContext().sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse(mVideoFilePath)));
+            Toast.makeText(getContext(),"视频保存在:"+mVideoFilePath,Toast.LENGTH_SHORT).show();
         }
     }
 

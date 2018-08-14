@@ -13,6 +13,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * Created by dingmouren
@@ -27,7 +28,7 @@ public class SavePhotoTask  extends AsyncTask<byte[],Integer,String>{
 
     private Context mContext;
 
-    private String mDirPath = Environment.getExternalStorageDirectory()+"/DICM/Camera/";
+    private String mDirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
 
     public SavePhotoTask(Context context){
         this.mContext = context;
@@ -35,8 +36,7 @@ public class SavePhotoTask  extends AsyncTask<byte[],Integer,String>{
 
     @Override
     protected void onPreExecute() {
-        File dirFile = new File(mDirPath);
-        if (!dirFile.exists()) dirFile.mkdir();
+
     }
 
     @Override
@@ -45,6 +45,9 @@ public class SavePhotoTask  extends AsyncTask<byte[],Integer,String>{
         Matrix matrix = new Matrix();
         matrix.postRotate(90);
         Bitmap newBitamap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+
+        File dirFile = new File(mDirPath);
+        if (!dirFile.exists()) dirFile.mkdirs();
         String filePath = mDirPath +"IMG_"+ System.currentTimeMillis()+".png";
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
