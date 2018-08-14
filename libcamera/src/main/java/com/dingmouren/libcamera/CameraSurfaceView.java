@@ -264,7 +264,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
             /*3.CamcorderProfile.QUALITY_HIGH:质量等级对应于最高可用分辨率*/
-            mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+            mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
 
             /*4.设置输出文件*/
             String dirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
@@ -272,6 +272,9 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             if (!dirFile.exists()) dirFile.mkdirs();
             mVideoFilePath = dirPath +"VIDEO_"+ System.currentTimeMillis()+".mp4";
             mMediaRecorder.setOutputFile(mVideoFilePath);
+
+            /*摄像头默认是横屏，这是拍摄的视频旋转90度*/
+            mMediaRecorder.setOrientationHint(90);
 
             /*5.设置预览输出*/
             mMediaRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
@@ -281,6 +284,13 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 
             /*7.开始录制*/
             mMediaRecorder.start();
+
+            mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+                @Override
+                public void onInfo(MediaRecorder mr, int what, int extra) {
+
+                }
+            });
         }catch (Exception e){
             e.printStackTrace();
         }
