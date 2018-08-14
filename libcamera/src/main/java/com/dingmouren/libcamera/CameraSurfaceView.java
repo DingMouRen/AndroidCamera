@@ -266,6 +266,23 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             /*3.CamcorderProfile.QUALITY_HIGH:质量等级对应于最高可用分辨率*/
             mMediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
 
+            /*设置视频的输出格式*/
+//            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+            /*设置音频的编码格式*/
+//            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+
+            /*设置视频的编码格式*/
+//            mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+
+            /*设置要捕获的视频的帧速率*/
+//            mMediaRecorder.setVideoFrameRate(30);
+
+            /*设置编码比特率*/
+//            mMediaRecorder.setVideoEncodingBitRate( 5 * 1024 * 1024);
+
+//            mMediaRecorder.setVideoSize(720,1280);
+
             /*4.设置输出文件*/
             String dirPath = Environment.getExternalStorageDirectory()+"/DCIM/Camera/";
             File dirFile = new File(dirPath);
@@ -285,12 +302,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
             /*7.开始录制*/
             mMediaRecorder.start();
 
-            mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
-                @Override
-                public void onInfo(MediaRecorder mr, int what, int extra) {
 
-                }
-            });
         }catch (Exception e){
             e.printStackTrace();
         }
