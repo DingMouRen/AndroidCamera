@@ -1,4 +1,4 @@
-package com.dingmouren.libcamera;
+package com.dingmouren.libcamera.ui.camera;
 
 import android.hardware.Camera;
 

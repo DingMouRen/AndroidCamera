@@ -1,17 +1,10 @@
-package com.dingmouren.libcamera;
+package com.dingmouren.libcamera.ui.camera;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
-import android.media.ExifInterface;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
@@ -28,10 +21,7 @@ import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 import com.dingmouren.libcamera.task.SavePhotoTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 

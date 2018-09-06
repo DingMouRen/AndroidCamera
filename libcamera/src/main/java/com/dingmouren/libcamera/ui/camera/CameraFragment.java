@@ -1,14 +1,10 @@
-package com.dingmouren.libcamera;
+package com.dingmouren.libcamera.ui.camera;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +12,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
-import android.widget.ScrollView;
-import android.widget.Scroller;
 
+import com.dingmouren.libcamera.R;
 import com.dingmouren.libcamera.listener.OnCameraParamsConfigInitedListener;
 import com.dingmouren.libcamera.listener.OnEffectChangedListener;
 import com.dingmouren.libcamera.listener.OnFlashModeChangedListener;
 import com.dingmouren.libcamera.listener.OnFocusModeChangedListener;
 import com.dingmouren.libcamera.listener.OnSceneModeChengedListener;
 import com.dingmouren.libcamera.view.TouchControlView;
-
-import java.util.Arrays;
 
 /**
  * Created by dingmouren
